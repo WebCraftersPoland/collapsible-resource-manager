@@ -1,17 +1,15 @@
 <template>
-
     <div v-if="!isEmpty || data.linkTo" :class="[ data.type, { 'mb-8': isTopLevel }, 'select-none' ]">
-
         <component v-if="data.label && isTopLevel" v-bind="topLevelLink"
-                   @click="toggleTopLevel"
-                   :class="{ 'cursor-pointer': isTopCollapsible }"
-                   class="flex flex-1 items-center font-normal text-white mb-2 text-base no-underline relative">
+                @click="toggleTopLevel; changeActiveTopLevel()"
+                :class="{ 'cursor-pointer': isTopCollapsible }"
+                class="flex flex-1 items-center font-normal text-white mb-2 text-base no-underline relative">
 
             <div v-if="data.icon" class="sidebar-icon" v-html="data.icon"/>
 
             <svg v-else class="sidebar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                 <path fill="var(--sidebar-icon)"
-                      d="M3 1h4c1.1045695 0 2 .8954305 2 2v4c0 1.1045695-.8954305 2-2 2H3c-1.1045695 0-2-.8954305-2-2V3c0-1.1045695.8954305-2 2-2zm0 2v4h4V3H3zm10-2h4c1.1045695 0 2 .8954305 2 2v4c0 1.1045695-.8954305 2-2 2h-4c-1.1045695 0-2-.8954305-2-2V3c0-1.1045695.8954305-2 2-2zm0 2v4h4V3h-4zM3 11h4c1.1045695 0 2 .8954305 2 2v4c0 1.1045695-.8954305 2-2 2H3c-1.1045695 0-2-.8954305-2-2v-4c0-1.1045695.8954305-2 2-2zm0 2v4h4v-4H3zm10-2h4c1.1045695 0 2 .8954305 2 2v4c0 1.1045695-.8954305 2-2 2h-4c-1.1045695 0-2-.8954305-2-2v-4c0-1.1045695.8954305-2 2-2zm0 2v4h4v-4h-4z"/>
+                    d="M3 1h4c1.1045695 0 2 .8954305 2 2v4c0 1.1045695-.8954305 2-2 2H3c-1.1045695 0-2-.8954305-2-2V3c0-1.1045695.8954305-2 2-2zm0 2v4h4V3H3zm10-2h4c1.1045695 0 2 .8954305 2 2v4c0 1.1045695-.8954305 2-2 2h-4c-1.1045695 0-2-.8954305-2-2V3c0-1.1045695.8954305-2 2-2zm0 2v4h4V3h-4zM3 11h4c1.1045695 0 2 .8954305 2 2v4c0 1.1045695-.8954305 2-2 2H3c-1.1045695 0-2-.8954305-2-2v-4c0-1.1045695.8954305-2 2-2zm0 2v4h4v-4H3zm10-2h4c1.1045695 0 2 .8954305 2 2v4c0 1.1045695-.8954305 2-2 2h-4c-1.1045695 0-2-.8954305-2-2v-4c0-1.1045695.8954305-2 2-2zm0 2v4h4v-4h-4z"/>
             </svg>
 
             <Badge :label="data.badge" :dim="isTopCollapsible || data.linkTo">
@@ -20,7 +18,7 @@
                     {{ data.label }}
                 </span>
 
-                <CollapsibleIndicator :expanded="topExpanded" :visible="isTopCollapsible"/>
+                <CollapsibleIndicator :expanded="isActiveTopLevel" :visible="isTopCollapsible"/>
 
             </Badge>
 
@@ -29,10 +27,10 @@
         <CollapseTransition :duration="150">
 
             <ResourceList class="resources-only"
-                          v-if="isTopLevel && data.resources.length && (!isTopCollapsible || topExpanded)"
-                          :resources="data.resources"
-                          :recursive="recursive"
-                          :remember-menu-state="rememberMenuState"/>
+                        v-if="isTopLevel && data.resources.length && (!isTopCollapsible || isActiveTopLevel)"
+                        :resources="data.resources"
+                        :recursive="recursive"
+                        :remember-menu-state="rememberMenuState"/>
 
         </CollapseTransition>
 
@@ -40,9 +38,10 @@
 
             <h4 class="relative select-none ml-8 mt-4 text-xs text-white-50% uppercase tracking-wide cursor-pointer"
                 v-if="data.label"
-                @click="toggleGroup(data.id)">
+                @click="toggleGroup(data.id); changeActiveGroup()"
+            >
 
-                <CollapsibleIndicator :expanded="activeMenu[data.id]" :visible="isTopCollapsible"/>
+                <CollapsibleIndicator :expanded="isActiveGroup" :visible="isTopCollapsible"/>
 
                 <Badge :label="data.badge">
                     {{ data.label }}
@@ -52,17 +51,15 @@
 
             <CollapseTransition :duration="150">
 
-                <ResourceList v-if="activeMenu[data.id]"
-                              :resources="data.resources"
-                              :recursive="recursive"
-                              :remember-menu-state="rememberMenuState"/>
+                <ResourceList v-if="isActiveGroup"
+                            :resources="data.resources"
+                            :recursive="recursive"
+                            :remember-menu-state="rememberMenuState"/>
 
             </CollapseTransition>
 
         </template>
-
-    </div>
-
+    </div>  
 </template>
 
 <script>
@@ -71,6 +68,7 @@
     import ResourceList from './ResourceList'
     import Badge from './Badge'
     import CollapsibleIndicator from './CollapsibleIndicator'
+    import { store } from './store';
 
     export default {
         name: 'CollapsibleResourceManager',
@@ -78,12 +76,14 @@
         props: {
             data: { type: Object, required: true },
             rememberMenuState: { type: Boolean, default: false },
-            recursive: { type: Boolean, default: false }
+            recursive: { type: Boolean, default: false },
+            activeGroup: { type: Number, default: null }
         },
         data() {
             return {
                 topExpanded: this.data.expanded,
-                activeMenu: { [ this.data.id ]: this.data.expanded }
+                activeMenu: { [ this.data.id ]: this.data.expanded },
+                state: store.state
             }
         },
         created() {
@@ -123,6 +123,12 @@
             isEmpty() {
                 return this.data.resources.length === 0
             },
+            isActiveGroup() {
+                return this.data.id == this.activeGroup;
+            },
+            isActiveTopLevel() {
+                return this.data.id == this.state.activeTopLevel;
+            },
             topLevelLink() {
 
                 if (this.data.linkTo) {
@@ -149,7 +155,15 @@
                 }
             },
             toggleGroup(id) {
-                this.activeMenu[ id ] = !this.activeMenu[ id ]
+                this.activeMenu[ id ] = !this.isActiveGroup;
+            },
+            changeActiveGroup() {
+                this.$emit('update:activeGroup', !this.isActiveGroup ? this.data.id : null);
+                this.$set(this.data, 'expanded', this.isActiveGroup);
+            },
+            changeActiveTopLevel() {
+                store.setActiveTopLevel(this.data.id);
+                this.$set(this.data, 'expanded', this.isActiveTopLevel);
             }
         }
     }

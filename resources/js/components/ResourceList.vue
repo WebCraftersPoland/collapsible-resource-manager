@@ -1,12 +1,12 @@
 <template>
 
     <ul class="list-reset">
-
         <li class="leading-tight pt-4 text-sm" v-for="resource of resources" :class="{ 'ml-8': !recursive }">
 
             <collapsible-resource-manager v-if="resource.type === 'group'"
                                           :data="resource"
                                           :remember-menu-state="rememberMenuState"
+                                          :activeGroup.sync="activeGroup"
                                           recursive/>
 
             <div v-else-if="resource.type === 'external_link'">
@@ -66,6 +66,11 @@
             resources: { type: Array, required: true },
             recursive: { type: Boolean, default: false },
             rememberMenuState: { type: Boolean, required: true }
+        },
+        data() {
+            return {
+                activeGroup: null
+            }
         }
     }
 
