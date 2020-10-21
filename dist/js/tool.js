@@ -1411,7 +1411,14 @@ var render = function() {
   return !_vm.isEmpty || _vm.data.linkTo
     ? _c(
         "div",
-        { class: [_vm.data.type, { "mb-8": _vm.isTopLevel }, "select-none"] },
+        {
+          class: [
+            _vm.data.type,
+            { "mb-8": _vm.isTopLevel, active: _vm.isActiveTopLevel },
+            "select-none",
+            "collapsible"
+          ]
+        },
         [
           _vm.data.label && _vm.isTopLevel
             ? _c(

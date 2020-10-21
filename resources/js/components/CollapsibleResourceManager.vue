@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!isEmpty || data.linkTo" :class="[ data.type, { 'mb-8': isTopLevel }, 'select-none' ]">
+    <div v-if="!isEmpty || data.linkTo" :class="[ data.type, { 'mb-8': isTopLevel, 'active': isActiveTopLevel }, 'select-none', 'collapsible' ]">
         <component v-if="data.label && isTopLevel" v-bind="topLevelLink"
                 @click="toggleTopLevel; changeActiveTopLevel()"
                 :class="{ 'cursor-pointer': isTopCollapsible }"
