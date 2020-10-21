@@ -175,11 +175,6 @@ __webpack_require__.r(__webpack_exports__);
     rotateIcon: {
       "default": false
     }
-  },
-  data: function data() {
-    return {
-      rotate: false
-    };
   }
 });
 

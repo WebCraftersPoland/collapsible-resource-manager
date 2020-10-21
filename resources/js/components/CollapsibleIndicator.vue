@@ -41,12 +41,7 @@
             rotateIcon: {
                 default: false
             }
-        },
-        data() {
-            return {
-                rotate: false,
-            }
-        },
+        }
     }
 
 </script>
