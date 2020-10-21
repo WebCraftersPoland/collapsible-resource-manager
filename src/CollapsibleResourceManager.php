@@ -23,6 +23,8 @@ class CollapsibleResourceManager extends Tool
     private $defaults = [
         'disable_default_resource_manager' => true,
         'remember_menu_state' => false,
+        'rotate_icon' => false,
+        'icon' => null,
         'navigation' => [],
     ];
 
@@ -69,6 +71,8 @@ class CollapsibleResourceManager extends Tool
     {
         return view('collapsible-resource-manager::navigation', [
             'rememberMenuState' => $this->config[ 'remember_menu_state' ],
+            'icon' => $this->config[ 'icon' ],
+            'rotateIcon' => $this->config[ 'rotate_icon' ],
             'navigation' => $this->parseNavigationResources($this->config[ 'navigation' ]),
         ]);
     }

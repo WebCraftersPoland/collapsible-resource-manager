@@ -18,7 +18,12 @@
                     {{ data.label }}
                 </span>
 
-                <CollapsibleIndicator :expanded="isActiveTopLevel" :visible="isTopCollapsible"/>
+                <CollapsibleIndicator 
+                    :icon="state.icon" 
+                    :expanded="isActiveTopLevel" 
+                    :visible="isTopCollapsible"
+                    :rotateIcon="state.rotateIcon && isActiveTopLevel"
+                />
 
             </Badge>
 
@@ -35,13 +40,17 @@
         </CollapseTransition>
 
         <template v-if="isGroup && data.resources.length">
-
             <h4 class="relative select-none ml-8 mt-4 text-xs text-white-50% uppercase tracking-wide cursor-pointer"
                 v-if="data.label"
                 @click="toggleGroup(data.id); changeActiveGroup()"
             >
 
-                <CollapsibleIndicator :expanded="isActiveGroup" :visible="isTopCollapsible"/>
+                <CollapsibleIndicator 
+                    :icon="state.icon" 
+                    :expanded="isActiveGroup" 
+                    :visible="isTopCollapsible"
+                    :rotateIcon="state.rotateIcon && isActiveGroup"
+                />
 
                 <Badge :label="data.badge">
                     {{ data.label }}
@@ -77,16 +86,23 @@
             data: { type: Object, required: true },
             rememberMenuState: { type: Boolean, default: false },
             recursive: { type: Boolean, default: false },
-            activeGroup: { type: Number, default: null }
+            activeGroup: { type: Number, default: null },
+            icon: { type: String, default: null },
+            rotateIcon: { type: Boolean, default: false }
         },
         data() {
             return {
                 topExpanded: this.data.expanded,
                 activeMenu: { [ this.data.id ]: this.data.expanded },
-                state: store.state
+                state: store.state,
             }
         },
         created() {
+            if(this.icon)
+                store.setIcon(this.icon);
+
+            if(this.rotateIcon)
+                store.setRotate(this.rotateIcon);
 
             if (this.rememberMenuState) {
 
