@@ -8,6 +8,10 @@
 
 Provides an easy way to order and group your resources on the sidebar.
 
+# Custom feature
+
+Custom resources behavior added - at most only one active element at the same time.
+
 # Installation
 
 You can install the package via composer:
